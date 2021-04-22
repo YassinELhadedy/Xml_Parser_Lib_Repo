@@ -22,8 +22,8 @@ object XmlParser2 {
     var Counter = 0
     const val LINE_NUMBER_KEY_NAME = "lineNumber"
     @Throws(IOException::class, SAXException::class)
-    fun listFilesForFolder(folder: File) {
-        for (fileEntry in folder.listFiles()) {
+    fun listFilesForFolder(folder: File ?=File(folderPath)) {
+        for (fileEntry in folder?.listFiles()!!) {
             if (fileEntry.isDirectory) {
                 listFilesForFolder(fileEntry)
             } else {
