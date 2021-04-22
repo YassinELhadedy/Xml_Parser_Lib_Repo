@@ -1,0 +1,3 @@
+include ':XmpParserlibrary'
+include ':app'
+rootProject.name = "Xml Parser Lib"
