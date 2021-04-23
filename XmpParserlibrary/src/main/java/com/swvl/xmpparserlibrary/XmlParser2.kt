@@ -22,21 +22,21 @@ object XmlParser2 {
     var Counter = 0
     const val LINE_NUMBER_KEY_NAME = "lineNumber"
     @Throws(IOException::class, SAXException::class)
-    fun listFilesForFolder(folder: File ?=File(folderPath),operation: (Int) -> Unit) {
+    fun listFilesForFolder(folder: File ?=File(folderPath)) {
         try {
             for (fileEntry in folder?.listFiles()!!) {
                 if (fileEntry.isDirectory) {
-                    listFilesForFolder(fileEntry,operation)
+                    listFilesForFolder(fileEntry)
                 } else {
-                    if (fileEntry.name.endsWith(".xml")) parseXMLfile(fileEntry,operation) else {
+                    if (fileEntry.name.endsWith(".xml")) parseXMLfile(fileEntry) else {
                         //System.out.println(fileEntry.getParent());
                         break
                     }
                 }
             }
+            println("Total warning = $Counter")
         }
        catch (e:Exception){
-           println ("error  ${e.message}")
        }
     }
 
@@ -108,7 +108,7 @@ object XmlParser2 {
     }
 
     @Throws(IOException::class, SAXException::class)
-    fun parseXMLfile(xmlFile: File,operation: (Int) -> Unit) {
+    fun parseXMLfile(xmlFile: File) {
         //String filePath = folderPath + "\\" + xmlFile.getName();
 
         //Array to save labels in one Activity, to prevent duplicate labels.
@@ -159,14 +159,13 @@ object XmlParser2 {
                         if (text_size.toInt() < 31) {
                             innerCounter++
                             Counter++
-                            operation(Counter)
+                            println("Counter $Counter")
                             println(
                                 "________ Warning in line " + textTag.getUserData("lineNumber") + ": The text size of <" + textTag.getNodeName() +
                                         "> is \"" + el_size + "\", it must be not less than \"31\".."
                             )
                         }
                     }catch (e: Exception){
-                        println ("error  ${e.message}")
                     }
                 } //________________________________________________________________________\\
 
@@ -183,7 +182,7 @@ object XmlParser2 {
                     if (!el_contentDescription.isEmpty()) {
                         innerCounter++
                         Counter++
-                        operation(Counter)
+                        println("Counter $Counter")
                         print("________ Warning in line " + textTag.getUserData("lineNumber") + ": the component <" + textTag.getNodeName())
                         println(
                             """
@@ -202,14 +201,14 @@ object XmlParser2 {
                         if (hints.contains(el_hint)) {
                             innerCounter++
                             Counter++
-                            operation(Counter)
+                            println("Counter $Counter")
 
                             println("________ Warning in line " + textTag.getUserData("lineNumber") + ": duplicate label \"" + el_hint + "\" in <" + textTag.getNodeName() + ">")
                         } else hints.add(el_hint)
                     } else {
                         innerCounter++
                         Counter++
-                        operation(Counter)
+                        println("Counter $Counter")
 
                         println("________ Warning in line " + textTag.getUserData("lineNumber") + ": Missing \"hint\" to provide instructions on how to fill the data entry field for the component: <" + textTag.getNodeName() + ">")
                     }
@@ -228,7 +227,7 @@ object XmlParser2 {
                 if (textTag.getNodeName() == "ImageView") {
                     innerCounter++
                     Counter++
-                    operation(Counter)
+                    println("Counter $Counter")
 
                     print("________ Warning in line " + textTag.getUserData("lineNumber") + ": In the component <" + textTag.getNodeName())
                     println("> Does the image you inserted contain text? \nIf the answer is \"yes\", this image is not accessible to persons with disabilities.")
@@ -249,7 +248,7 @@ object XmlParser2 {
                         if (el_width.substring(0, index).toInt() < 57) {
                             innerCounter++
                             Counter++
-                            operation(Counter)
+                            println("Counter $Counter")
 
                             println(
                                 "________ Warning in line " + textTag.getUserData("lineNumber") + ": The width size of <" + textTag.getNodeName() +
@@ -266,7 +265,7 @@ object XmlParser2 {
                         if (el_height.substring(0, index).toInt() < 57) {
                             innerCounter++
                             Counter++
-                            operation(Counter)
+                            println("Counter $Counter")
 
                             println(
                                 "________ Warning in line " + textTag.getUserData("lineNumber") + ": The height size of <" + textTag.getNodeName() +
@@ -282,14 +281,14 @@ object XmlParser2 {
                         if (contents.contains(el_contentDescription)) {
                             innerCounter++
                             Counter++
-                            operation(Counter)
+                            println("Counter $Counter")
 
                             println("________ Warning in line " + textTag.getUserData("lineNumber") + ": duplicate label \"" + el_contentDescription + "\" in <" + textTag.getNodeName() + ">")
                         } else contents.add(el_contentDescription)
                     } else {
                         innerCounter++
                         Counter++
-                        operation(Counter)
+                        println("Counter $Counter")
                         println("________ Warning in line " + textTag.getUserData("lineNumber") + ": Missing \"contentDescription\" for the component: <" + textTag.getNodeName() + ">")
                     }
                 }
