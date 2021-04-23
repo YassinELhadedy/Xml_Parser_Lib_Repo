@@ -165,7 +165,7 @@ object XmlParser2 {
                             )
                         }
                     }catch (e: Exception){
-                        throw(e)
+                        println ("error  ${e.message}")
                     }
                 } //________________________________________________________________________\\
 
