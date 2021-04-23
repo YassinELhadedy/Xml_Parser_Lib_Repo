@@ -150,13 +150,17 @@ object XmlParser2 {
                     val text_size = el_size.substring(0, 2)
 
 //******************/\/\/\/\/\/\/\/\/\/\/\/\..FIRST RULES: TEXT SIZE >= 31sp../\/\/\/\/\/\/\/\/\/\/\
-                    if (text_size.toInt() < 31) {
-                        innerCounter++
-                        Counter++
-                        println(
-                            "________ Warning in line " + textTag.getUserData("lineNumber") + ": The text size of <" + textTag.getNodeName() +
-                                    "> is \"" + el_size + "\", it must be not less than \"31\".."
-                        )
+                    try {
+                        if (text_size.toInt() < 31) {
+                            innerCounter++
+                            Counter++
+                            println(
+                                "________ Warning in line " + textTag.getUserData("lineNumber") + ": The text size of <" + textTag.getNodeName() +
+                                        "> is \"" + el_size + "\", it must be not less than \"31\".."
+                            )
+                        }
+                    }catch (e: Exception){
+                        throw(e)
                     }
                 } //________________________________________________________________________\\
 
