@@ -23,16 +23,21 @@ object XmlParser2 {
     const val LINE_NUMBER_KEY_NAME = "lineNumber"
     @Throws(IOException::class, SAXException::class)
     fun listFilesForFolder(folder: File ?=File(folderPath)) {
-        for (fileEntry in folder?.listFiles()!!) {
-            if (fileEntry.isDirectory) {
-                listFilesForFolder(fileEntry)
-            } else {
-                if (fileEntry.name.endsWith(".xml")) parseXMLfile(fileEntry) else {
-                    //System.out.println(fileEntry.getParent());
-                    break
+        try {
+            for (fileEntry in folder?.listFiles()!!) {
+                if (fileEntry.isDirectory) {
+                    listFilesForFolder(fileEntry)
+                } else {
+                    if (fileEntry.name.endsWith(".xml")) parseXMLfile(fileEntry) else {
+                        //System.out.println(fileEntry.getParent());
+                        break
+                    }
                 }
             }
         }
+       catch (e:Exception){
+           throw (e)
+       }
     }
 
     @Throws(IOException::class, SAXException::class)
