@@ -21,7 +21,7 @@ object XmlParser2 {
     var folderPath = System.getProperty("user.dir") + "/app/src/main/res/"
     var Counter = 0
     const val LINE_NUMBER_KEY_NAME = "lineNumber"
-
+    var flagRecursive = false
     @Throws(IOException::class, SAXException::class)
     fun listFilesForFolder(folder: File? = File(folderPath)) {
         try {
@@ -29,14 +29,16 @@ object XmlParser2 {
 
                 if (fileEntry.isDirectory) {
                     listFilesForFolder(fileEntry)
+                    flagRecursive = true
                 } else {
                     if (fileEntry.name.endsWith(".xml")) parseXMLfile(fileEntry) else {
                         //System.out.println(fileEntry.getParent());
 
                     }
                 }
+                flagRecursive =false
 
-                if (index == folder.listFiles().size-1){
+                if (index == folder.listFiles().size-1 && !flagRecursive) {
                     println("Total warning = $Counter  in $index  files")
 
                 }
@@ -134,7 +136,9 @@ object XmlParser2 {
         val document = readXML(`is`)
         `is`.close()
         println("-------------------------------")
-        println("IN FILE: \"" + xmlFile.name + "\"")
+        if (innerCounter != 0) {
+            println("IN FILE: \"" + xmlFile.name + "\"")
+        }
         /*
         // Get the Document Builder
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -302,6 +306,6 @@ object XmlParser2 {
                 }
             }
         }
-        if (innerCounter == 0) println("<..PASS..>, warning $innerCounter")
+        // if (innerCounter == 0) println("<..PASS..>, warning $innerCounter")
     }
 }
