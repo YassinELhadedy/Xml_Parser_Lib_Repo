@@ -36,8 +36,8 @@ object XmlParser2 {
                     }
                 }
 
-                if (index == folder.listFiles().size){
-                    println("Total warning = $Counter")
+                if (index == folder.listFiles().size-1){
+                    println("Total warning = $Counter  in $index  files")
 
                 }
 
