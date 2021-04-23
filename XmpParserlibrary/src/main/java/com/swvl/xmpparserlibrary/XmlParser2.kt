@@ -21,23 +21,31 @@ object XmlParser2 {
     var folderPath = System.getProperty("user.dir") + "/app/src/main/res/"
     var Counter = 0
     const val LINE_NUMBER_KEY_NAME = "lineNumber"
+
     @Throws(IOException::class, SAXException::class)
-    fun listFilesForFolder(folder: File ?=File(folderPath)) {
+    fun listFilesForFolder(folder: File? = File(folderPath)) {
         try {
-            for (fileEntry in folder?.listFiles()!!) {
+            folder?.listFiles()!!.forEachIndexed { index, fileEntry ->
+
                 if (fileEntry.isDirectory) {
                     listFilesForFolder(fileEntry)
                 } else {
                     if (fileEntry.name.endsWith(".xml")) parseXMLfile(fileEntry) else {
                         //System.out.println(fileEntry.getParent());
-                        break
+
                     }
                 }
+
+                if (index == folder.listFiles().size){
+                    println("Total warning = $Counter")
+
+                }
+
             }
-            println("Total warning = $Counter")
+
+
+        } catch (e: Exception) {
         }
-       catch (e:Exception){
-       }
     }
 
     @Throws(IOException::class, SAXException::class)
@@ -165,7 +173,7 @@ object XmlParser2 {
                                         "> is \"" + el_size + "\", it must be not less than \"31\".."
                             )
                         }
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                     }
                 } //________________________________________________________________________\\
 
