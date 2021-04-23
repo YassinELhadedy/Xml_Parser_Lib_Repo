@@ -20,24 +20,30 @@ import javax.xml.parsers.SAXParserFactory
 object XmlParser2 {
     var folderPath = System.getProperty("user.dir") + "/app/src/main/res/"
     var Counter = 0
+    var fileCounter = 0
     const val LINE_NUMBER_KEY_NAME = "lineNumber"
 
+    fun scanFiles() {
+        listFilesForFolder()
+        println("Total Warnings= $Counter In Files ${fileCounter}")
+    }
+
     @Throws(IOException::class, SAXException::class)
-    fun listFilesForFolder(folder: File? = File(folderPath)) {
+    private fun listFilesForFolder(folder: File? = File(folderPath)) {
         try {
             folder?.listFiles()!!.forEachIndexed { index, fileEntry ->
-
                 if (fileEntry.isDirectory) {
                     listFilesForFolder(fileEntry)
                 } else {
-                    if (fileEntry.name.endsWith(".xml")) parseXMLfile(fileEntry) else {
+                    if (fileEntry.name.endsWith(".xml")) {
+                        fileCounter++
+                        parseXMLfile(fileEntry)
+                    } else {
                         //System.out.println(fileEntry.getParent());
-
                     }
                 }
 
             }
-            println("Total Warnings= $Counter")
         } catch (e: Exception) {
         }
     }
