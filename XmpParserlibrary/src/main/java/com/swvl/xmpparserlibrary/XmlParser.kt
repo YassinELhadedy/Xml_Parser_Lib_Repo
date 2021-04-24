@@ -17,13 +17,14 @@ import javax.xml.parsers.ParserConfigurationException
 import javax.xml.parsers.SAXParser
 import javax.xml.parsers.SAXParserFactory
 
-object XmlParser2 {
-    var folderPath = System.getProperty("user.dir") + "/app/src/main/res/"
+object XmlParser {
+    private lateinit var folderPath: String
     var Counter = 0
     var fileCounter = 0
     const val LINE_NUMBER_KEY_NAME = "lineNumber"
 
-    fun scanFiles() {
+    fun scanFiles(folderPath: String) {
+        this.folderPath = folderPath
         listFilesForFolder()
         println("Total Warnings= $Counter In Files ${fileCounter}")
     }
