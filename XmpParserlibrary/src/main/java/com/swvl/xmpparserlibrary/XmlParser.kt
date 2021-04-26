@@ -25,7 +25,7 @@ object XmlParser {
 
     fun scanFiles() {
         listFilesForFolder()
-        println("Total Warnings= $Counter In Files ${fileCounter}")
+        println("\nTOTAL RESULT: --> You Have $Counter Accessibility Issues In ${fileCounter} Files")
     }
 
 
@@ -43,7 +43,6 @@ object XmlParser {
                         //System.out.println(fileEntry.getParent());
                     }
                 }
-
             }
         } catch (e: Exception) {
         }
@@ -123,14 +122,11 @@ object XmlParser {
         //Array to save labels in one Activity, to prevent duplicate labels.
         val hints: ArrayList<String> = ArrayList<String>()
         val contents: ArrayList<String> = ArrayList<String>()
-        //For count warnings in one Activity
-        var innerCounter = 0
-        /*
-         * Get the Document Builder
-         * Get Document
-         * Normalize the xml structure
-         * Get all the element by the tag name
-         * */
+        //For count violations, potential violations, warnings in one Activity
+        var vCounter = 0
+        var pvCounter = 0
+        var wCounter = 0
+
         val `is`: InputStream = FileInputStream(xmlFile)
         val document = readXML(`is`)
         `is`.close()
@@ -141,7 +137,8 @@ object XmlParser {
 
         // Get Document
         Document document = builder.parse (new File(filePath));
-*/
+        */
+
         //Normalize the xml structure
         document.documentElement.normalize()
 
@@ -164,11 +161,10 @@ object XmlParser {
 //******************/\/\/\/\/\/\/\/\/\/\/\/\..FIRST RULES: TEXT SIZE >= 31sp../\/\/\/\/\/\/\/\/\/\/\
                     try {
                         if (text_size.toInt() < 31) {
-                            innerCounter++
+                            wCounter++
                             Counter++
-                            println("Counter $Counter")
-                            println(
-                                "________ Warning in line " + textTag.getUserData("lineNumber") + ": The text size of <" + textTag.getNodeName() +
+                            print("Issue # $Counter")
+                            println(": <Warning> in line " + textTag.getUserData("lineNumber") + ": The text size of <" + textTag.getNodeName() +
                                         "> is \"" + el_size + "\", it must be not less than \"31\".."
                             )
                         }
@@ -187,17 +183,14 @@ object XmlParser {
 
                     //if there is contentDescription
                     if (!el_contentDescription.isEmpty()) {
-                        innerCounter++
+                        vCounter++
                         Counter++
-                        println("Counter $Counter")
-                        print("________ Warning in line " + textTag.getUserData("lineNumber") + ": the component <" + textTag.getNodeName())
-                        println(
-                            """
-    > Input fields should have their speakable text set as “hints”, not “content description”. 
-    If the content description property is set, the screen reader will read it even when the input field is not empty, which could confuse the user who might not know what part is
-    the text in the input field and which part is the content description.
-    """.trimIndent()
-                        )
+                        print("Issue # $Counter")
+                        print(": <Violation> in line " + textTag.getUserData("lineNumber") + ": the component <" + textTag.getNodeName())
+                        println("Input fields should have their speakable text set as “hints”, not “content description”. \n" +
+                                "    If the content description property is set, the screen reader will read it even when the " +
+                                "input field is not empty, which could confuse the user who might not know what part is\n" +
+                                "    the text in the input field and which part is the content description.")
                     }
                     //if there is hint
                     if (!el_hint.isEmpty()) {
@@ -206,18 +199,16 @@ object XmlParser {
 
                         //Check hint in arraylist, if it exist, there is duplicate, print warning
                         if (hints.contains(el_hint)) {
-                            innerCounter++
+                            vCounter++
                             Counter++
-                            println("Counter $Counter")
-
-                            println("________ Warning in line " + textTag.getUserData("lineNumber") + ": duplicate label \"" + el_hint + "\" in <" + textTag.getNodeName() + ">")
+                            print("Issue # $Counter")
+                            println(": <Violation> in line " + textTag.getUserData("lineNumber") + ": duplicate label \"" + el_hint + "\" in <" + textTag.getNodeName() + ">")
                         } else hints.add(el_hint)
                     } else {
-                        innerCounter++
+                        pvCounter++
                         Counter++
-                        println("Counter $Counter")
-
-                        println("________ Warning in line " + textTag.getUserData("lineNumber") + ": Missing \"hint\" to provide instructions on how to fill the data entry field for the component: <" + textTag.getNodeName() + ">")
+                        print("Issue # $Counter")
+                        println(": <Potential violation> in line " + textTag.getUserData("lineNumber") + ": Missing \"hint\" to provide instructions on how to fill the data entry field for the component: <" + textTag.getNodeName() + ">")
                     }
 
 //*****************/\/\/\/\/\/\/\/\/\/\/\/\..FOURTH RULES: PROVIDE FIELD FILL-IN TIPS TO AVOID INCREASING THE VISUALLY IMPAIRED USER INTERACTION LOAD DUE TO INCORRECT INPUT.
@@ -225,18 +216,20 @@ object XmlParser {
                     //Read fill in tips of the element
                     val el_text = textElement.getAttribute("android:text")
                     if (el_text.isEmpty()) {
-                        //Counter++;
-                        println("________ ** Note in line " + textTag.getUserData("lineNumber") + ": Try to write text tips to help user to fill field in component <" + textTag.getNodeName() + ">")
+                        wCounter++
+                        Counter++
+                        print("Issue # $Counter")
+                        println(": <Warning> in line " + textTag.getUserData("lineNumber") + ": Try to write text tips to help user to fill field in component <" + textTag.getNodeName() + ">")
                     }
                 }
 
 //******************/\/\/\/\/\/\/\/\/\/\/\/\..FIFTH RULES: WARN IF THE IMAGE CONTAIN TEXT../\/\/\/\/\/\/\/\/\/\/\
                 if (textTag.getNodeName() == "ImageView") {
-                    innerCounter++
+                    pvCounter++
                     Counter++
-                    println("Counter $Counter")
+                    print("Issue # $Counter")
 
-                    print("________ Warning in line " + textTag.getUserData("lineNumber") + ": In the component <" + textTag.getNodeName())
+                    print(": <Potential violation> in line " + textTag.getUserData("lineNumber") + ": In the component <" + textTag.getNodeName())
                     println("> Does the image you inserted contain text? \nIf the answer is \"yes\", this image is not accessible to persons with disabilities.")
                 }
 
@@ -246,38 +239,25 @@ object XmlParser {
                     val el_width = textElement.getAttribute("android:layout_width")
                     //Read hight of the element.
                     val el_height = textElement.getAttribute("android:layout_height")
-                    if (!(el_width.equals(
-                            "wrap_content",
-                            ignoreCase = true
-                        ) || el_width.equals("match_parent", ignoreCase = true))
-                    ) {
+                    if (!(el_width.equals("wrap_content", ignoreCase = true) || el_width.equals("match_parent", ignoreCase = true))) {
                         val index = el_width.indexOf("d")
                         if (el_width.substring(0, index).toInt() < 57) {
-                            innerCounter++
+                            wCounter++
                             Counter++
-                            println("Counter $Counter")
+                            print("Issue # $Counter")
 
-                            println(
-                                "________ Warning in line " + textTag.getUserData("lineNumber") + ": The width size of <" + textTag.getNodeName() +
-                                        "> is \"" + el_width + "\", it must be not less than \"57dp\".."
-                            )
+                            println(": <Warning> in line " + textTag.getUserData("lineNumber") + ": The width size of <" + textTag.getNodeName() +
+                                        "> is \"" + el_width + "\", it must be not less than \"57dp\"")
                         }
                     }
-                    if (!(el_height.equals(
-                            "wrap_content",
-                            ignoreCase = true
-                        ) || el_height.equals("match_parent", ignoreCase = true))
-                    ) {
+                    if (!(el_height.equals("wrap_content", ignoreCase = true) || el_height.equals("match_parent", ignoreCase = true))) {
                         val index = el_height.indexOf("d")
                         if (el_height.substring(0, index).toInt() < 57) {
-                            innerCounter++
+                            wCounter++
                             Counter++
-                            println("Counter $Counter")
-
-                            println(
-                                "________ Warning in line " + textTag.getUserData("lineNumber") + ": The height size of <" + textTag.getNodeName() +
-                                        "> is \"" + el_height + "\", it must be not less than \"57dp\".."
-                            )
+                            print("Issue # $Counter")
+                            println(": <Warning> in line " + textTag.getUserData("lineNumber") + ": The height size of <" + textTag.getNodeName() +
+                                        "> is \"" + el_height + "\", it must be not less than \"57dp\"")
                         }
                     }
                     //check if contentDescription missing or duplicated.
@@ -286,25 +266,26 @@ object XmlParser {
 
                         //Check contentDescription in arraylist, if it exist, there is duplicate, print warning
                         if (contents.contains(el_contentDescription)) {
-                            innerCounter++
+                            vCounter++
                             Counter++
-                            println("Counter $Counter")
+                            print("Issue # $Counter")
 
-                            println("________ Warning in line " + textTag.getUserData("lineNumber") + ": duplicate label \"" + el_contentDescription + "\" in <" + textTag.getNodeName() + ">")
+                            println(": <Violation> in line " + textTag.getUserData("lineNumber") + ": duplicate label \"" + el_contentDescription + "\" in <" + textTag.getNodeName() + ">")
                         } else contents.add(el_contentDescription)
                     } else {
-                        innerCounter++
+                        pvCounter++
                         Counter++
-                        println("Counter $Counter")
-                        println("________ Warning in line " + textTag.getUserData("lineNumber") + ": Missing \"contentDescription\" for the component: <" + textTag.getNodeName() + ">")
+                        print("Issue # $Counter")
+                        println(": <Potential violation> in line " + textTag.getUserData("lineNumber") + ": Missing \"contentDescription\" for the component: <" + textTag.getNodeName() + ">")
                     }
                 }
             }
         }
 
-        if (innerCounter != 0) {
-            println("-------------------------------")
-            println("IN FILE:   ${xmlFile.name} CONTAINS $innerCounter WARNINGS")
+        if (vCounter != 0 || pvCounter != 0 || wCounter != 0) {
+            println("^")
+            println("^ YOU HAVE: $vCounter <Violations>, $pvCounter <Potential violations>, $wCounter <Warnings>,  IN  -->  ${xmlFile.parent}/${xmlFile.name} ")
+            println("---------------------------------------------")
         }
     }
 }
