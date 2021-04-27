@@ -17,6 +17,11 @@ import javax.xml.parsers.ParserConfigurationException
 import javax.xml.parsers.SAXParser
 import javax.xml.parsers.SAXParserFactory
 
+
+fun main(){
+    XmlParser.scanFiles()
+}
+
 object XmlParser {
     var folderPath = System.getProperty("user.dir") + "/app/src/main/res/"
     var Counter = 0
